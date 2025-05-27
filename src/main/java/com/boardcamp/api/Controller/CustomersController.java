@@ -5,11 +5,16 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.boardcamp.api.Dto.CustomersDto;
 import com.boardcamp.api.Model.CustomersModel;
 import com.boardcamp.api.Service.CustomersService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/customers")
@@ -23,4 +28,9 @@ public class CustomersController {
         List<CustomersModel> customers=customersService.findAllCustomers();
         return ResponseEntity.status(HttpStatus.OK).body(customers);
     }
+    @PostMapping
+    public  ResponseEntity<Object> postCustomer(@RequestBody @Valid CustomersDto customer){
+        CustomersModel customerSave=customersService.insertCustomer(customer);
+        return ResponseEntity.status(HttpStatus.OK).body(customerSave);
+}
 }
