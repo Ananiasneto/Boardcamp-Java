@@ -1,5 +1,7 @@
 package com.boardcamp.api.Model;
 
+import com.boardcamp.api.Dto.GamesDto;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -36,4 +38,11 @@ public class GamesModel {
     @NotNull(message = "preço por dia está em branco")
     @Min(value = 1, message = "o preço por dia não pode menor que 0")
     private Integer pricePerDay;
+
+    public GamesModel(GamesDto gamesDto) {
+    this.name = gamesDto.getName();
+    this.image = gamesDto.getImage();
+    this.stockTotal = gamesDto.getStockTotal();
+    this.pricePerDay = gamesDto.getPricePerDay();
+}
 }
