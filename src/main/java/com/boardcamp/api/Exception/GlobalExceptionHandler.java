@@ -11,7 +11,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> gameTittleConflictException (GameTittleConflictException gameTittleConflictException){
 
     return ResponseEntity.status(HttpStatus.CONFLICT).body(gameTittleConflictException.getMessage());
-        
+    } 
+    @ExceptionHandler({CustomerCpfConflictException.class})
+    public ResponseEntity<Object> customerCpfConflictException (CustomerCpfConflictException customerCpfConflictException){
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(customerCpfConflictException.getMessage());
     }
-    
+    @ExceptionHandler({CustomerNotFoundException.class})
+    public ResponseEntity<Object> customerCpfConflictException (CustomerNotFoundException customerNotFoundException){
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(customerNotFoundException.getMessage());
+    }
 }
