@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.boardcamp.api.Dto.GamesDto;
+import com.boardcamp.api.Exception.GameTittleConflictException;
 import com.boardcamp.api.Model.GamesModel;
 import com.boardcamp.api.repository.GamesRepository;
 
@@ -18,9 +19,15 @@ public class GamesService {
     return gamesRepository.findAll();
     }
     public GamesModel insertGames(GamesDto game){
-        GamesModel gameDto=new GamesModel(game);
+        boolean gameExist=gamesRepository.existsByName(game.getName());
+        if(gameExist){
+            throw new GameTittleConflictException("esse jogo já está cadastrado");
+        }else{
+           GamesModel gameDto=new GamesModel(game);
         GamesModel gameSave=gamesRepository.save(gameDto);
-        return gameSave;
+        return gameSave; 
+        }
+        
     }
 
 }
