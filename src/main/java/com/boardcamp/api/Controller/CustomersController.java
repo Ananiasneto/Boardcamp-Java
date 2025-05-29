@@ -37,6 +37,6 @@ public class CustomersController {
     @PostMapping
     public  ResponseEntity<Object> postCustomer(@RequestBody @Valid CustomersDto customer){
         CustomersModel customerSave=customersService.insertCustomer(customer);
-        return ResponseEntity.status(HttpStatus.OK).body(customerSave);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerSave);
 }
 }

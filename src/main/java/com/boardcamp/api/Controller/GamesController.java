@@ -35,6 +35,6 @@ public class GamesController {
      public ResponseEntity<Object> postGames(@RequestBody @Valid GamesDto body) {
         GamesModel game=gamesService.insertGames(body);
 
-    return ResponseEntity.status(HttpStatus.OK).body(game);
+    return ResponseEntity.status(HttpStatus.CREATED).body(game);
     }
 }

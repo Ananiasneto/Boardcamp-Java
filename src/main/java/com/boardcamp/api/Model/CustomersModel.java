@@ -29,7 +29,7 @@ public class CustomersModel {
     @NotBlank(message = "o nome não pode estar em branco")
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     @NotBlank(message = "o telefone não pode estar em branco")
     private String phone;
 

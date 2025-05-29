@@ -8,6 +8,12 @@ import org.springframework.stereotype.Service;
 
 
 import com.boardcamp.api.Dto.RentalsDto;
+import com.boardcamp.api.Exception.CustomerNotFoundException;
+import com.boardcamp.api.Exception.GameNotFoundException;
+import com.boardcamp.api.Exception.GameStockUnprocesableEntityException;
+import com.boardcamp.api.Exception.RentalNotFoundException;
+import com.boardcamp.api.Exception.RentalReturnDateNotNullException;
+import com.boardcamp.api.Exception.RentalReturnDateNullException;
 import com.boardcamp.api.Model.CustomersModel;
 import com.boardcamp.api.Model.GamesModel;
 import com.boardcamp.api.Model.RentalsModel;
@@ -34,17 +40,17 @@ public class RentalsService {
      
     public RentalsModel insertRental(RentalsDto dto){
         CustomersModel customer = customersRepository.findById(dto.getCustomerId())
-        .orElseThrow(() -> new RuntimeException("cliente não encontrado"));
+        .orElseThrow(() -> new CustomerNotFoundException("cliente não encontrado"));
 
     GamesModel game = gamesRepository.findById(dto.getGameId())
-        .orElseThrow(() -> new RuntimeException("jogo não encontrado"));
+        .orElseThrow(() -> new GameNotFoundException("jogo não encontrado"));
 
         RentalsModel rental=new RentalsModel(dto,customer,game);
 
          List<RentalsModel> gamesRental=rentalsRepository.findByGameIdAndReturnDateIsNull(rental.getGame().getId());
 
         if(rental.getGame().getStockTotal()<=gamesRental.size()){
-        throw new RuntimeException("não tem mais esse jogo no estoque desse jogo");
+        throw new GameStockUnprocesableEntityException ("não tem mais esse jogo no estoque");
         }
         
         return rentalsRepository.save(rental);
@@ -52,11 +58,12 @@ public class RentalsService {
 
      public RentalsModel putRental(Long id) {
     RentalsModel rental = rentalsRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("aluguel não encontrado"));
-    List<RentalsModel> gamesRental=rentalsRepository.findByGameIdAndReturnDateIsNull(rental.getGame().getId());
-    if(rental.getGame().getStockTotal()<=gamesRental.size()){
-       throw new RuntimeException("não tem mais esse jogo no estoque desse jogo");
-    }
+        .orElseThrow(() -> new RentalNotFoundException("aluguel não encontrado"));
+
+        if(rental.getReturnDate()!=null){
+            throw new RentalReturnDateNotNullException("aluguel já finalizado");
+        }
+    
 
      LocalDate returnDate = LocalDate.now();
     rental.setReturnDate(returnDate);
@@ -74,5 +81,14 @@ public class RentalsService {
 
         return rentalsRepository.save(rental);
 }
+ public void deletRental(Long id) {
+    RentalsModel rental = rentalsRepository.findById(id)
+        .orElseThrow(() -> new RentalNotFoundException("aluguel não encontrado"));
+
+        if(rental.getReturnDate()==null){
+            throw new RentalReturnDateNullException("aluguel não está finalizado");
+        }
+        rentalsRepository.delete(rental);
+    }
 
 }

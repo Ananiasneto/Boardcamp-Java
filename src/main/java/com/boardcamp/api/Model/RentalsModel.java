@@ -37,12 +37,11 @@ public class RentalsModel {
     private Integer delayFee;
 
     @ManyToOne
-    @JoinColumn(name = "game_id",nullable = false)
-    private GamesModel game;
-
-    @ManyToOne
     @JoinColumn(name = "customer_id",nullable = false)
     private CustomersModel customers;
+    @ManyToOne
+    @JoinColumn(name = "game_id",nullable = false)
+    private GamesModel game;
 
     public RentalsModel(RentalsDto dto, CustomersModel customer, GamesModel game) {
         this.rentDate = LocalDate.now();
