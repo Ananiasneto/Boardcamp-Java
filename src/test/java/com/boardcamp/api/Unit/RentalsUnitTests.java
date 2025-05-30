@@ -22,6 +22,7 @@ import com.boardcamp.api.Exception.GameNotFoundException;
 import com.boardcamp.api.Exception.GameStockUnprocesableEntityException;
 import com.boardcamp.api.Exception.RentalNotFoundException;
 import com.boardcamp.api.Exception.RentalReturnDateNotNullException;
+import com.boardcamp.api.Exception.RentalReturnDateNullException;
 import com.boardcamp.api.Model.CustomersModel;
 import com.boardcamp.api.Model.GamesModel;
 import com.boardcamp.api.Model.RentalsModel;
@@ -170,6 +171,46 @@ public class RentalsUnitTests {
 
         verify(rentalsRepository,times(1)).findById(any());
         verify(rentalsRepository,times(1)).save(rental);
+    }
+    @Test
+    void givenRentalNotFound_WhenDeletRental_ThenThrowError(){
+        
+        doReturn(Optional.empty()).when(rentalsRepository).findById(any());
+
+        RentalNotFoundException rentalNotFoundException=assertThrows(RentalNotFoundException.class, ()->rentalsService.deletRental(any()));
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+        verify(rentalsRepository,times(0)).delete(any());
+        assertEquals(rentalNotFoundException.getMessage(), "aluguel não encontrado");
+    }
+
+    @Test
+    void givenRentalNotFinish_WhenDeletRental_ThenThrowError(){
+         RentalsModel rental =new RentalsModel();
+        doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+
+        RentalReturnDateNullException rentalReturnDateNullException=assertThrows(RentalReturnDateNullException.class, ()->rentalsService.deletRental(any()));
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+        verify(rentalsRepository,times(0)).delete(any());
+        assertEquals(rentalReturnDateNullException.getMessage(), "aluguel não está finalizado");
+    }
+     @Test
+    void givenRentalDelet_WhenDeletRental_ThenRentalDeleted(){
+         RentalsModel rental =new RentalsModel();
+         rental.setId(1L);
+        doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+  rental.setReturnDate(LocalDate.now());
+  
+        rentalsService.deletRental(rental.getId());
+        
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+        verify(rentalsRepository,times(1)).delete(any());
+
     }
 
 }
