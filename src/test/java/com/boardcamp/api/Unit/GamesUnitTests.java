@@ -1,4 +1,4 @@
-package com.boardcamp.api;
+package com.boardcamp.api.Unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +19,7 @@ import com.boardcamp.api.Service.GamesService;
 import com.boardcamp.api.repository.GamesRepository;
 
 @SpringBootTest
-class ApiApplicationTests {
+class GamesUnitTests {
 
 	@InjectMocks
 	private GamesService gamesService;
@@ -50,10 +50,6 @@ class ApiApplicationTests {
 		verify(gamesRepository,times(1)).existsByName(any());
 		verify(gamesRepository,times(1)).save(any());
 		assertEquals(gamesModel, result);
-	}
-
-	@Test
-	void contextLoads() {
 	}
 
 }
