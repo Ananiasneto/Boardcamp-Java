@@ -2,9 +2,11 @@ package com.boardcamp.api.Dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class RentalsDto {
 
     @NotNull(message = "o ID do cliente não pode ser vazio")
