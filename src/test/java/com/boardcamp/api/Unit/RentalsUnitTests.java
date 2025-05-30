@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ import com.boardcamp.api.Dto.RentalsDto;
 import com.boardcamp.api.Exception.CustomerNotFoundException;
 import com.boardcamp.api.Exception.GameNotFoundException;
 import com.boardcamp.api.Exception.GameStockUnprocesableEntityException;
+import com.boardcamp.api.Exception.RentalNotFoundException;
+import com.boardcamp.api.Exception.RentalReturnDateNotNullException;
 import com.boardcamp.api.Model.CustomersModel;
 import com.boardcamp.api.Model.GamesModel;
 import com.boardcamp.api.Model.RentalsModel;
@@ -121,4 +124,52 @@ public class RentalsUnitTests {
         assertEquals(rentalsModel, result);
 
     }
+
+    @Test
+    void givenRentalNotFound_WhenPutRental_ThenThrowError(){
+        doReturn(Optional.empty()).when(rentalsRepository).findById(any());
+
+        RentalNotFoundException rentalNotFoundException=assertThrows(RentalNotFoundException.class,()->rentalsService.putRental(any()));
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+
+        verify(rentalsRepository,times(0)).save(any());
+
+        assertEquals("aluguel não encontrado", rentalNotFoundException.getMessage());
+    }
+
+     @Test
+    void givenRentalIsFinish_WhenPutRental_ThenThrowError(){
+        RentalsModel rental=new RentalsModel();
+        rental.setReturnDate(LocalDate.now());
+        doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+
+
+        RentalReturnDateNotNullException rentalReturnDateNotNullException=assertThrows(RentalReturnDateNotNullException.class,()->rentalsService.putRental(any()));
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+
+        verify(rentalsRepository,times(0)).save(any());
+
+        assertEquals("aluguel já finalizado", rentalReturnDateNotNullException.getMessage());
+    }
+ @Test
+    void givenRentalInsert_WhenPutRental_ThenReturnRental(){
+        CustomersModel customer=new CustomersModel(1L,"test","test","test");
+
+        GamesModel game =new GamesModel (1L,"test","test",1,2);
+
+        RentalsDto rentalDto=new RentalsDto(1L,1l,1);
+        RentalsModel rental=new RentalsModel(rentalDto,customer,game);
+
+        doReturn(Optional.of(rental)).when(rentalsRepository).findById(any());
+        rentalsService.putRental(1L);
+
+
+        verify(rentalsRepository,times(1)).findById(any());
+        verify(rentalsRepository,times(1)).save(rental);
+    }
+
 }
