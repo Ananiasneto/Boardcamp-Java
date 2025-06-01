@@ -76,6 +76,26 @@ public void givenGamesExist_whenPostGames_thenThrowError() {
 
 }
 @Test
+public void givenGamesInvalid_whenPostGames_thenThrowError() {
+
+    GamesDto gamesDto=new GamesDto("", "test", 3, 3000);
+
+    HttpEntity<GamesDto> body = new HttpEntity<>(gamesDto);
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/games",
+        HttpMethod.POST,
+        body,
+        String.class
+    );
+
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()); 
+		assertEquals(0, gamesRepository.count()); 
+
+
+}
+
+@Test
 public void givenGamesSucess_whenPostGames_thenReturnGame() {
 
     GamesDto gamesDto=new GamesDto("test", "test", 3, 3000);
