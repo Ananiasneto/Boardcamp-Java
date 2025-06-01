@@ -170,12 +170,8 @@ null,300,null,customer,game
 		assertEquals(1, rentalsRepository.count()); 
 
     }
-
-
-
-     @Test
+    @Test
     void givenRentalNotFound_whenFinishRentals_theThrowError(){
-
     ResponseEntity<String> response = restTemplate.exchange(
         "/rentals/{id}/return",
         HttpMethod.POST,
@@ -190,10 +186,9 @@ null,300,null,customer,game
 		assertEquals(0, rentalsRepository.count()); 
 
     }
-    
     @Test
     void givenRentalIsFinish_whenFinishRentals_theThrowError(){
-        CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
     GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
     gamesRepository.save(game);
     customersRepository.save(customer);
@@ -216,9 +211,9 @@ null,300,null,customer,game
 		assertEquals(1, rentalsRepository.count()); 
 
     }
-        @Test
+    @Test
     void givenRentalSucess_whenFinishRentals_thenReturnCreated(){
-        CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
     GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
     gamesRepository.save(game);
     customersRepository.save(customer);
@@ -239,4 +234,67 @@ null,300,null,customer,game
 		assertEquals(1, rentalsRepository.count()); 
 
     }
+    @Test
+    void givenDeleteRentalIdNotFound_whenDeletRentals_thenThrowError(){
+    
+        ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/{id}",
+        HttpMethod.DELETE,
+        null,
+        String.class,
+        9999999999l
+
+    );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("aluguel não encontrado", response.getBody());
+		assertEquals(0, rentalsRepository.count()); 
+    }
+    @Test
+    void givenDeleteRentalIsNotFinish_whenDeletRentals_thenThrowError(){
+    CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
+    gamesRepository.save(game);
+    customersRepository.save(customer);
+    RentalsDto rentaldto=new RentalsDto(customer.getId(),game.getId(),3);
+    RentalsModel rentalsModel=new RentalsModel(rentaldto,customer,game); 
+    RentalsModel rentalId=rentalsRepository.save(rentalsModel);
+    
+        ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/{id}",
+        HttpMethod.DELETE,
+        null,
+        String.class,
+        rentalId.getId()
+
+    );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("aluguel não está finalizado", response.getBody());
+		assertEquals(1, rentalsRepository.count()); 
+    }
+     @Test
+    void givenDeleteRentalSucess_whenDeletRentals_thenReturnOk(){
+    CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
+    gamesRepository.save(game);
+    customersRepository.save(customer);
+    RentalsDto rentaldto=new RentalsDto(customer.getId(),game.getId(),3);
+    RentalsModel rentalsModel=new RentalsModel(rentaldto,customer,game);
+    rentalsModel.setReturnDate(LocalDate.now()); 
+    RentalsModel rentalId=rentalsRepository.save(rentalsModel);
+    
+        ResponseEntity<Void> response = restTemplate.exchange(
+        "/rentals/{id}",
+        HttpMethod.DELETE,
+        null,
+        Void.class,
+        rentalId.getId()
+
+    );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, rentalsRepository.count()); 
+    }
+
 }
