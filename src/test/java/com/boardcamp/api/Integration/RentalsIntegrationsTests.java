@@ -1,6 +1,7 @@
 package com.boardcamp.api.Integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 
@@ -166,6 +167,75 @@ null,300,null,customer,game
         assertEquals(HttpStatus.CREATED, response.getStatusCode()); 
         assertEquals(gameId, response.getBody().getGame());
         assertEquals(customerId, response.getBody().getCustomers());
+		assertEquals(1, rentalsRepository.count()); 
+
+    }
+
+
+
+     @Test
+    void givenRentalNotFound_whenFinishRentals_theThrowError(){
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/{id}/return",
+        HttpMethod.POST,
+        null,
+        String.class,
+        999999999999l
+
+    );
+    
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()); 
+        assertEquals("aluguel não encontrado", response.getBody()); 
+		assertEquals(0, rentalsRepository.count()); 
+
+    }
+    
+    @Test
+    void givenRentalIsFinish_whenFinishRentals_theThrowError(){
+        CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
+    gamesRepository.save(game);
+    customersRepository.save(customer);
+    RentalsDto rentaldto=new RentalsDto(customer.getId(),game.getId(),3);
+    RentalsModel rentalsModel=new RentalsModel(rentaldto,customer,game); 
+    rentalsModel.setReturnDate(LocalDate.now());
+    RentalsModel rentalId=rentalsRepository.save(rentalsModel);
+   
+    ResponseEntity<String> response = restTemplate.exchange(
+        "/rentals/{id}/return",
+        HttpMethod.POST,
+        null,
+        String.class,
+        rentalId.getId()
+
+    );
+    
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+        assertEquals("aluguel já finalizado", response.getBody()); 
+		assertEquals(1, rentalsRepository.count()); 
+
+    }
+        @Test
+    void givenRentalSucess_whenFinishRentals_thenReturnCreated(){
+        CustomersModel customer=new CustomersModel(null,"test","12345678910","12345678910");
+    GamesModel game = new GamesModel(null, "test", "test", 1, 3000);
+    gamesRepository.save(game);
+    customersRepository.save(customer);
+    RentalsDto rentaldto=new RentalsDto(customer.getId(),game.getId(),3);
+    RentalsModel rentalsModel=new RentalsModel(rentaldto,customer,game); 
+    RentalsModel rentalId=rentalsRepository.save(rentalsModel);
+   
+    ResponseEntity<RentalsModel> response = restTemplate.exchange(
+        "/rentals/{id}/return",
+        HttpMethod.POST,
+        null,
+        RentalsModel.class,
+        rentalId.getId()
+
+    );
+        assertNotNull(response.getBody().getReturnDate());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertEquals(1, rentalsRepository.count()); 
 
     }

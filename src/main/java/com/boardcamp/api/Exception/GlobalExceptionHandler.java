@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RentalReturnDateNotNullException.class})
     public ResponseEntity<Object> rentalReturnDateNotNullException(RentalReturnDateNotNullException rentalReturnDateNotNullException){
         
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(rentalReturnDateNotNullException.getMessage());
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(rentalReturnDateNotNullException.getMessage());
     }
     @ExceptionHandler({RentalReturnDateNullException.class})
     public ResponseEntity<Object> rentalReturnDateNullException(RentalReturnDateNullException rentalReturnDateNullException){
